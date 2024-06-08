@@ -469,6 +469,19 @@ app.delete('/plans/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete diet plan' });
   }
 });
+app.get('/getTrainer/:trainerId', async (req, res) => {
+  try {
+    const trainer = await User.findById(req.params.trainerId);
+    if (!trainer) {
+      return res.status(404).send('Trainer not found');
+    }
+    res.json(trainer);
+  } catch (error) {
+    console.error('Error fetching trainer:', error);
+    res.status(500).send('Failed to fetch trainer');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
