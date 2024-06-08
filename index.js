@@ -471,8 +471,10 @@ app.delete('/plans/:id', async (req, res) => {
 });
 app.get('/getTrainer/:trainerId', async (req, res) => {
   try {
+    console.log(`Fetching trainer with ID: ${req.params.trainerId}`);
     const trainer = await User.findById(req.params.trainerId);
     if (!trainer) {
+      console.log('Trainer not found');
       return res.status(404).send('Trainer not found');
     }
     res.json(trainer);
