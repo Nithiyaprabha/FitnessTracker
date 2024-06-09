@@ -469,6 +469,17 @@ app.delete('/plans/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete diet plan' });
   }
 });
+
+const { ObjectId } = mongoose.Types;
+
+// Validate ObjectId middleware
+const validateObjectId = (req, res, next) => {
+  if (!ObjectId.isValid(req.params.trainerId)) {
+    return res.status(400).send('Invalid trainerId format');
+  }
+  next();
+};
+
 app.get('/getTrainer/:trainerId', async (req, res) => {
   try {
     const trainer = await User.findById(req.params.trainerId).populate('followers', 'name email');
