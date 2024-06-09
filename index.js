@@ -471,10 +471,8 @@ app.delete('/plans/:id', async (req, res) => {
 });
 app.get('/getTrainer/:trainerId', async (req, res) => {
   try {
-    console.log(`Fetching trainer with ID: ${req.params.trainerId}`);
-    const trainer = await User.findById(req.params.trainerId);
+    const trainer = await User.findById(req.params.trainerId).populate('followers', 'name email');
     if (!trainer) {
-      console.log('Trainer not found');
       return res.status(404).send('Trainer not found');
     }
     res.json(trainer);
@@ -483,6 +481,7 @@ app.get('/getTrainer/:trainerId', async (req, res) => {
     res.status(500).send('Failed to fetch trainer');
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
