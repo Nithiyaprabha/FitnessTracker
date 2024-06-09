@@ -250,7 +250,7 @@ app.delete('/deleteVideo', async (req, res) => {
   const { url } = req.query;
   try {
     await Video.findOneAndDelete({ url });
-    const trainer = await Trainer.findOneAndUpdate(
+    const trainer = await User.findOneAndUpdate(
       { videos: url },
       { $pull: { videos: url } },
       { new: true }
