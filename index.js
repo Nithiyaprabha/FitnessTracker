@@ -275,23 +275,33 @@ app.put('/editWorkout/:id', async (req, res) => {
   }
 });
 
-// Delete Workout Route
-app.delete('/deleteWorkout/:id', async (req, res) => {
-  const { id } = req.params;
-
+app.delete('/deleteWorkout', async (req, res) => {
   try {
-    const deletedWorkout = await Workout.findByIdAndDelete(id);
+    // Extract the workout ID from the query parameters
+    const { workoutId } = req.query;
 
+    // Check if the workout ID parameter is provided
+    if (!workoutId) {
+      return res.status(400).json({ message: 'Workout ID parameter is required' });
+    }
+
+    // Find the workout by its ID and delete it
+    const deletedWorkout = await Workout.findByIdAndDelete(workoutId);
+
+    // Check if the workout was found and deleted
     if (!deletedWorkout) {
       return res.status(404).json({ error: 'Workout not found' });
     }
 
+    // Send a success response
     res.status(200).json({ message: 'Workout deleted successfully' });
   } catch (error) {
+    // If any error occurs, send a server error response
     console.error('Error deleting workout:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 app.get('/getAllData', async (req, res) => {
   try {
@@ -524,92 +534,67 @@ app.delete('/unlikeVideo/:videoId', async (req, res) => {
 
 
 // Get a single diet plan by ID
-app.get('/plans/:id', async (req, res) => {
+app.get('/plans/:trainerId', async (req, res) => {
+  const { trainerId } = req.params;
   try {
-    const plan = await DietPlan.findById(req.params.id);
-    if (!plan) {
-      return res.status(404).json({ error: 'Diet plan not found' });
-    }
-    res.json(plan);
+    const plans = await DietPlan.find({ trainerId });
+    res.status(200).json(plans);
   } catch (error) {
-    console.error('Error fetching diet plan:', error);
-    res.status(500).json({ error: 'Failed to fetch diet plan' });
+    console.error('Error fetching trainer diet plans:', error);
+    res.status(500).json({ error: 'Failed to fetch trainer diet plans' });
   }
 });
-
-// Create a new diet plan
-app.post('/plans', async (req, res) => {
-  try {
-    const newPlan = new DietPlan(req.body);
-    await newPlan.save();
-    res.status(201).json(newPlan);
-  } catch (error) {
-    console.error('Error creating diet plan:', error);
-    res.status(500).json({ error: 'Failed to create diet plan' });
-  }
-});
-// app.get('/trainer-diet-plans', async (req, res) => {
-//   const { trainerId } = req.query;
-
-//   // Validate if trainerId is provided
-//   if (!trainerId) {
-//     return res.status(400).json({ error: 'Trainer ID is required' });
-//   }
-
-//   try {
-//     // Find diet plans associated with the given trainerId
-//     const dietPlans = await DietPlan.find({ trainerId });
-
-//     // Check if any diet plans are found
-//     if (!dietPlans.length) {
-//       return res.status(404).json({ error: 'No diet plans found for this trainer' });
-//     }
-
-//     // Return the fetched diet plans
-//     res.status(200).json(dietPlans);
-//   } catch (error) {
-//     console.error('Error fetching trainer diet plans:', error);
-//     res.status(500).json({ error: 'Failed to fetch trainer diet plans' });
-//   }
-// });
-
-// Update an existing diet plan
 app.put('/plans/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const updatedPlan = await DietPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedPlan = await DietPlan.findByIdAndUpdate(id, req.body, { new: true });
     if (!updatedPlan) {
       return res.status(404).json({ error: 'Diet plan not found' });
     }
-    res.json(updatedPlan);
+    res.status(200).json(updatedPlan);
   } catch (error) {
     console.error('Error updating diet plan:', error);
     res.status(500).json({ error: 'Failed to update diet plan' });
   }
 });
 
-// Delete a diet plan
-app.delete('/plans/:id', async (req, res) => {
+app.get('/plans', async (req, res) => {
   try {
-    const deletedPlan = await DietPlan.findByIdAndDelete(req.params.id);
-    if (!deletedPlan) {
+    const plans = await DietPlan.find();
+    res.status(200).json(plans);
+  } catch (error) {
+    console.error('Error fetching diet plans:', error);
+    res.status(500).json({ error: 'Failed to fetch diet plans' });
+  }
+});
+app.delete('/deleteDiet', async (req, res) => {
+  try {
+    // Extract the ID of the diet plan from the query parameters
+    const { id } = req.query;
+
+    // Check if the ID parameter is provided
+    if (!id) {
+      return res.status(400).json({ message: 'ID parameter is required' });
+    }
+
+    // Find the diet plan by ID and delete it
+    const deletedDietPlan = await DietPlan.findByIdAndDelete(id);
+
+    // Check if the diet plan exists
+    if (!deletedDietPlan) {
       return res.status(404).json({ error: 'Diet plan not found' });
     }
-    res.json({ message: 'Diet plan deleted successfully' });
+
+    // Send a success response
+    res.status(200).json({ message: 'Diet plan deleted successfully' });
   } catch (error) {
+    // If any error occurs, send a server error response
     console.error('Error deleting diet plan:', error);
-    res.status(500).json({ error: 'Failed to delete diet plan' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-const { ObjectId } = mongoose.Types;
 
-// Validate ObjectId middleware
-const validateObjectId = (req, res, next) => {
-  if (!ObjectId.isValid(req.params.trainerId)) {
-    return res.status(400).send('Invalid trainerId format');
-  }
-  next();
-};
 
 app.get('/getTrainer/:trainerId', async (req, res) => {
   try {

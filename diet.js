@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mealSchema = new mongoose.Schema({
+  trainerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Trainer', // Assuming you have a Trainer model
+    required: true
+  },
   mealName: String,
   foodItems: String,
   quantity: String,
