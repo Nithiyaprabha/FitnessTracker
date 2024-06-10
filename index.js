@@ -88,25 +88,16 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// app.get('/getTrainerDetails', async (req, res) => {
-//   const { trainerId } = req.query;
-//   try {
-//     const trainer = await Trainer.findById(trainerId);
-//     res.status(200).json({ trainer });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
 
-// app.get('/getTrainerVideos', async (req, res) => {
-//   const { trainerId } = req.query;
-//   try {
-//     const trainer = await Trainer.findById(trainerId);
-//     res.status(200).json({ videos: trainer.videos });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+app.get('/getTrainerVideos', async (req, res) => {
+  const { trainerId } = req.query;
+  try {
+    const trainer = await Trainer.findById(trainerId);
+    res.status(200).json({ videos: trainer.videos });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Initialize Cloudinary
 cloudinary.config({
@@ -156,8 +147,34 @@ app.use(function (err, req, res, next) {
 });
 
 // Video upload route
+// app.post('/uploadVideo', upload.single('video'), async (req, res) => {
+//   const { title, trainerId } = req.body;
+
+//   if (!req.file) {
+//     return res.status(400).json({ error: 'No file uploaded' });
+//   }
+
+//   const { path } = req.file;
+
+//   try {
+//     const result = await cloudinary.uploader.upload(path, { resource_type: 'video' });
+
+//     const newVideo = new Video({
+//       title,
+//       url: result.secure_url,
+//       uploadedBy: trainerId,
+//     });
+
+//     await newVideo.save();
+
+//     res.status(200).json({ url: result.secure_url });
+//   } catch (error) {
+//     console.error('Error uploading video:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 app.post('/uploadVideo', upload.single('video'), async (req, res) => {
-  const { title, trainerId } = req.body;
+  const { title, trainerId, caption } = req.body;
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -171,6 +188,7 @@ app.post('/uploadVideo', upload.single('video'), async (req, res) => {
     const newVideo = new Video({
       title,
       url: result.secure_url,
+      caption,
       uploadedBy: trainerId,
     });
 
@@ -182,6 +200,27 @@ app.post('/uploadVideo', upload.single('video'), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+app.put('/editVideo/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, url, caption } = req.body;
+
+  try {
+    const updatedVideo = await Video.findByIdAndUpdate(
+      id,
+      { title, url, caption },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedVideo) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+
+    res.status(200).json(updatedVideo);
+  } catch (error) {
+    console.error('Error updating video:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
 // Workout upload route
 app.post('/addWorkout', upload.single('image'), async (req, res) => {
@@ -212,6 +251,47 @@ app.post('/addWorkout', upload.single('image'), async (req, res) => {
   }
 });
 
+app.put('/editWorkout/:id', async (req, res) => {
+  const { id } = req.params;
+  const { trainerId, workoutName, description, category, imageUrl } = req.body;
+
+  try {
+    const updatedWorkout = await Workout.findByIdAndUpdate(id, {
+      trainerId,
+      workoutName,
+      description,
+      category,
+      imageUrl
+    }, { new: true });
+
+    if (!updatedWorkout) {
+      return res.status(404).json({ error: 'Workout not found' });
+    }
+
+    res.status(200).json({ message: 'Workout updated successfully', workout: updatedWorkout });
+  } catch (error) {
+    console.error('Error updating workout:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete Workout Route
+app.delete('/deleteWorkout/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedWorkout = await Workout.findByIdAndDelete(id);
+
+    if (!deletedWorkout) {
+      return res.status(404).json({ error: 'Workout not found' });
+    }
+
+    res.status(200).json({ message: 'Workout deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting workout:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/getAllData', async (req, res) => {
   try {
@@ -246,25 +326,60 @@ app.get('/getWorkouts', async (req, res) => {
 
 
 
+// app.delete('/deleteVideo', async (req, res) => {
+//   const { url } = req.query;
+//   try {
+//     await Video.findOneAndDelete({ url });
+//     const trainer = await User.findOneAndUpdate(
+//       { videos: url },
+//       { $pull: { videos: url } },
+//       { new: true }
+//     );
+
+//     const publicId = url.split('/').pop().split('.')[0];
+//     await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+
+//     res.status(200).json({ message: 'Video deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+
 app.delete('/deleteVideo', async (req, res) => {
-  const { url } = req.query;
   try {
+    // Extract the URL of the video from the query parameters
+    const { url } = req.query;
+
+    // Check if the URL parameter is provided
+    if (!url) {
+      return res.status(400).json({ message: 'URL parameter is required' });
+    }
+
+    // Find the video by URL and delete it
     await Video.findOneAndDelete({ url });
+
+    // Update the associated user's videos array to remove the deleted video URL
     const trainer = await User.findOneAndUpdate(
       { videos: url },
       { $pull: { videos: url } },
       { new: true }
     );
 
+    // Extract the public ID from the video URL and destroy it from Cloudinary
     const publicId = url.split('/').pop().split('.')[0];
-    await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+    // Make sure the publicId exists before trying to destroy the resource in Cloudinary
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+    }
 
+    // Send a success response
     res.status(200).json({ message: 'Video deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    // If any error occurs, send a server error response
+    console.error('Error deleting video:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 app.post('/followTrainer', async (req, res) => {
   try {
     const { traineeId, trainerId } = req.body;
@@ -490,6 +605,36 @@ app.get('/getTrainer/:trainerId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching trainer:', error);
     res.status(500).send('Failed to fetch trainer');
+  }
+});
+app.get('/trainer-videos', async (req, res) => {
+  try {
+    const { trainerId } = req.query;
+
+    // Ensure the trainerId is provided
+    if (!trainerId) {
+      return res.status(400).json({ error: 'Trainer ID is required' });
+    }
+
+    // Verify Trainer
+    const trainer = await User.findById(trainerId);
+    if (!trainer || trainer.role !== 'trainer') {
+      return res.status(404).json({ error: 'Trainer not found' });
+    }
+    console.log('Trainer found:', trainer);
+
+    // Find Videos
+    const videos = await Video.find({ uploadedBy: trainerId });
+    if (!videos || videos.length === 0) {
+      return res.status(404).json({ error: 'No videos found for this trainer' });
+    }
+    console.log('Videos found:', videos);
+
+    // Respond with the videos
+    res.json(videos);
+  } catch (error) {
+    console.error('Error fetching trainer videos:', error);
+    res.status(500).json({ error: 'Failed to fetch trainer videos' });
   }
 });
 

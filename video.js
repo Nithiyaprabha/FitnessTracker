@@ -8,9 +8,14 @@ const videoSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    uploader: {
+    caption: {
+      type: String,
+      required: true
+    },
+
+    uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Trainer' // Assuming you have a Trainer model for uploadedBy field
+      ref: 'User' // Assuming you have a Trainer model for uploadedBy field
     },
     createdAt: {
       type: Date,
