@@ -521,15 +521,7 @@ app.delete('/unlikeVideo/:videoId', async (req, res) => {
   }
 });
 
-app.get('/plans', async (req, res) => {
-  try {
-    const plans = await DietPlan.find();
-    res.json(plans);
-  } catch (error) {
-    console.error('Error fetching diet plans:', error);
-    res.status(500).json({ error: 'Failed to fetch diet plans' });
-  }
-});
+
 
 // Get a single diet plan by ID
 app.get('/plans/:id', async (req, res) => {
@@ -556,6 +548,30 @@ app.post('/plans', async (req, res) => {
     res.status(500).json({ error: 'Failed to create diet plan' });
   }
 });
+// app.get('/trainer-diet-plans', async (req, res) => {
+//   const { trainerId } = req.query;
+
+//   // Validate if trainerId is provided
+//   if (!trainerId) {
+//     return res.status(400).json({ error: 'Trainer ID is required' });
+//   }
+
+//   try {
+//     // Find diet plans associated with the given trainerId
+//     const dietPlans = await DietPlan.find({ trainerId });
+
+//     // Check if any diet plans are found
+//     if (!dietPlans.length) {
+//       return res.status(404).json({ error: 'No diet plans found for this trainer' });
+//     }
+
+//     // Return the fetched diet plans
+//     res.status(200).json(dietPlans);
+//   } catch (error) {
+//     console.error('Error fetching trainer diet plans:', error);
+//     res.status(500).json({ error: 'Failed to fetch trainer diet plans' });
+//   }
+// });
 
 // Update an existing diet plan
 app.put('/plans/:id', async (req, res) => {
@@ -635,6 +651,26 @@ app.get('/trainer-videos', async (req, res) => {
   } catch (error) {
     console.error('Error fetching trainer videos:', error);
     res.status(500).json({ error: 'Failed to fetch trainer videos' });
+  }
+});
+app.get('/trainer-workouts', async (req, res) => {
+  const { trainerId } = req.query;
+
+  if (!trainerId) {
+    return res.status(400).json({ error: 'Trainer ID is required' });
+  }
+
+  try {
+    const workouts = await Workout.find({ trainerId });
+
+    if (!workouts.length) {
+      return res.status(404).json({ error: 'No workouts found for this trainer' });
+    }
+
+    res.status(200).json(workouts);
+  } catch (error) {
+    console.error('Error fetching trainer workouts:', error);
+    res.status(500).json({ error: 'Failed to fetch trainer workouts' });
   }
 });
 
