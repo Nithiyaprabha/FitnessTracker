@@ -1,0 +1,234 @@
+ .trainee-dashboard {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 800px;
+  }
+  
+  .trainee-dashboard h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .trainee-dashboard input[type="text"],
+  .trainee-dashboard input[type="number"] {
+    width: calc(100% - 10px);
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .trainee-dashboard button {
+    padding: 10px 20px;
+    background-color: #07284c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .trainee-dashboard button:hover {
+    background-color:  #07284c;
+  }
+  
+  .trainee-dashboard h3 {
+    margin-top: 20px;
+  }
+  
+  .trainee-dashboard ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .trainee-dashboard li {
+    margin-bottom: 20px;
+  }
+  
+  .trainee-dashboard video {
+    width: 100%;
+    height: auto;
+  }
+  
+  .trainee-dashboard video::-webkit-media-controls {
+    display: none;
+  }
+  
+  .trainee-dashboard p {
+    margin-top: 10px;
+  }
+  
+  .trainee-dashboard .currently-playing {
+    margin-top: 20px;
+  } 
+  /* Trainee.css */
+.trainee-dashboard {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+
+.trainee-dashboard {
+  padding: 20px;
+}
+
+.search-form, .bmi-form, .suggested-videos, .data-list {
+  margin-bottom: 20px;
+}
+
+.bmi-form .bmi-input {
+  margin-bottom: 10px;
+}
+
+.grid-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+  justify-content: space-between; 
+}
+.grid-item {
+  flex: 1 1 calc(33.333% - 20px); 
+  box-sizing: border-box;
+  padding: 10px; 
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.grid-item h4 {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.grid-item p {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.grid-item video,
+.grid-item img {
+  width: 150px; 
+  height: 150px; 
+  display: block;
+  object-fit: cover; 
+}
+
+.currently-playing video {
+  width: 320px;
+  height: 240px;
+}
+
+.data-list {
+  margin-top: 20px;
+}
+
+.data-list h3 {
+  margin-bottom: 10px;
+}
+
+.data-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.data-list ul li {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  border-color: black;
+  flex: 0 0 45%; 
+  margin-right: 20px;
+}
+
+.data-list ul li img,
+.data-list ul li video {
+  width: 150px; 
+  height: 150px; 
+  display: block;
+  object-fit: cover; 
+}
+
+.data-list ul {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+
+@media screen and (max-width: 768px) {
+  .data-list ul li {
+    flex: 0 0 100%;
+    margin-right: 0;
+  }
+}
+.trainee-dashboard {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-form, .bmi-form {
+  margin-bottom: 20px;
+}
+
+.bmi-input {
+  margin-bottom: 10px;
+}
+
+.data-list, .suggested-videos {
+  margin-top: 20px;
+}
+
+.grid-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.grid-item {
+  flex: 1 1 calc(33.333% - 20px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 10px;
+  background: #fff;
+}
+
+.grid-item h4 {
+  margin-top: 0;
+}
+
+.grid-item video {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.grid-item button {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+} 
